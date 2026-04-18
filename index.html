@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Форма заявки</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .container {
+        background: rgba(0,0,0,0.7);
+        padding: 30px;
+        border-radius: 15px;
+        width: 320px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 8px;
+        outline: none;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background: #00c6ff;
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #0072ff;
+    }
+
+    .status {
+        margin-top: 10px;
+        text-align: center;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>Залишити заявку</h2>
+
+    <input type="text" id="name" placeholder="Ваше ім'я" required>
+    <input type="tel" id="phone" placeholder="Телефон" required>
+    <textarea id="message" placeholder="Ваше повідомлення"></textarea>
+
+    <button onclick="sendToTelegram()">Відправити</button>
+
+    <div class="status" id="status"></div>
+</div>
+
+<script>
+function sendToTelegram() {
+
+    // 🔴 ВСТАВ СЮДИ СВІЙ TOKEN БОТА
+    const TOKEN = "8694849031:AAFO5yLCDGCAZTyIhreyGh4yLvs3icSOg4k";
+
+    // 🔴 ВСТАВ СЮДИ СВІЙ CHAT ID
+    const CHAT_ID = "7320485812";
+
+    const name = document.getElementById("name").value;
+    const phone = document.getElementById("phone").value;
+    const message = document.getElementById("message").value;
+
+    const status = document.getElementById("status");
+
+    if (!name || !phone) {
+        status.innerHTML = "❌ Заповніть обов'язкові поля!";
+        return;
+    }
+
+    const text = `
+📩 Нова заявка:
+👤 Ім'я: ${name}
+📞 Телефон: ${phone}
+💬 Повідомлення: ${message}
+`;
+
+    fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: text
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            status.innerHTML = "✅ Заявка відправлена!";
+            document.getElementById("name").value = "";
+            document.getElementById("phone").value = "";
+            document.getElementById("message").value = "";
+        } else {
+            status.innerHTML = "❌ Помилка відправки!";
+        }
+    })
+    .catch(error => {
+        status.innerHTML = "❌ Помилка з'єднання!";
+    });
+}
+</script>
+
+</body>
+</html>
